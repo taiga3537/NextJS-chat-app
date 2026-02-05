@@ -57,14 +57,59 @@ export default function ChatBox() {
     sendChatMessage(messageText);
   };
 
+  // --- メッセージ表示リストの生成（改造部分） ---
   const messageElements = messages.map((message, index) => {
     const key = message.serial ?? index;
+    
+    // 発言者の名前を取得
+    const authorName = message.clientId || "匿名"; 
+    
+    // 名前の判定：'Admin' という名前の時だけ特別なスタイルを適用する
+    const isAdmin = authorName === 'taiga3537'; 
+
     return (
-      <span key={key} className={styles.message}>
-        {message.text}
-      </span>
+      <div key={key} style={{ 
+        marginBottom: '14px', 
+        paddingLeft: '10px',
+        // 管理者なら左側に赤い縦線を表示して強調する
+        borderLeft: isAdmin ? '4px solid #ff4b4b' : 'none' 
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '2px' }}>
+          {/* 名前の表示：管理者は赤色、それ以外はグレー */}
+          <span style={{ 
+            fontWeight: 'bold', 
+            fontSize: '0.85em', 
+            color: isAdmin ? '#ff4b4b' : '#555' 
+          }}>
+            {authorName}
+          </span>
+
+          {/* 管理者専用の「OFFICIAL」バッジ（テキストと枠線のみ） */}
+          {isAdmin && (
+            <span style={{ 
+              marginLeft: '8px', 
+              fontSize: '10px', 
+              padding: '1px 5px', 
+              border: '1px solid #ff4b4b', 
+              color: '#ff4b4b', 
+              borderRadius: '4px',
+              fontWeight: 'bold',
+              letterSpacing: '0.5px',
+              backgroundColor: '#fffafa' // 背景に極めて薄い赤を入れる
+            }}>
+              OFFICIAL
+            </span>
+          )}
+        </div>
+        
+        {/* メッセージ本文 */}
+        <span className={styles.message}>
+          {message.text}
+        </span>
+      </div>
     );
   });
+  // ------------------------------------------
 
   useEffect(() => {
     messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
